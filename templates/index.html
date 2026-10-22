@@ -3,14 +3,14 @@
 {% include 'objetos_disponibles.html' %}
 <section>
     <h2>Solicitudes pendientes</h2>
-    <div class="table-wrap"><table>
-        <thead><tr><th>Alumno</th><th>Equipo</th><th>Cant.</th><th>Devolución</th><th>Acciones</th></tr></thead>
+    <div class="table-wrap"><table class="management-table">
+        <thead><tr><th scope="col">Alumno</th><th scope="col">Equipo</th><th scope="col">Cant.</th><th scope="col">Devolución</th><th scope="col">Acciones</th></tr></thead>
         <tbody>{% for solicitud in solicitudes %}
         <tr>
-            <td>{{ solicitud.estudiante }}<small>{{ solicitud.curso }}</small></td>
-            <td>{{ solicitud.articulo }}<small>{{ solicitud.codigo }}</small></td>
-            <td>{{ solicitud.cantidad }}</td><td>{{ solicitud.fecha_prevista }}</td>
-            <td><div class="actions">
+            <td data-label="Alumno">{{ solicitud.estudiante }}<small>{{ solicitud.curso }}</small></td>
+            <td data-label="Equipo">{{ solicitud.articulo }}<small>{{ solicitud.codigo }}</small></td>
+            <td data-label="Cantidad">{{ solicitud.cantidad }}</td><td data-label="Devolución">{{ solicitud.fecha_prevista }}</td>
+            <td data-label="Acciones"><div class="actions">
                 <form action="{{ url_for('approve_request', request_id=solicitud.id) }}" method="post">
                     <input type="hidden" name="csrf" value="{{ session.csrf }}"><button>Aprobar</button>
                 </form>
@@ -24,14 +24,14 @@
 </section>
 <section>
     <h2>Equipos prestados</h2>
-    <div class="table-wrap"><table>
-        <thead><tr><th>Alumno</th><th>Equipo</th><th>Cant.</th><th>Devolución</th><th>Acción</th></tr></thead>
+    <div class="table-wrap"><table class="management-table">
+        <thead><tr><th scope="col">Alumno</th><th scope="col">Equipo</th><th scope="col">Cant.</th><th scope="col">Devolución</th><th scope="col">Acción</th></tr></thead>
         <tbody>{% for prestamo in prestamos %}
         <tr>
-            <td>{{ prestamo.estudiante }}<small>{{ prestamo.curso }}</small></td>
-            <td>{{ prestamo.articulo }}<small>{{ prestamo.codigo }}</small></td>
-            <td>{{ prestamo.cantidad }}</td><td>{{ prestamo.fecha_prevista }}</td>
-            <td><form action="{{ url_for('return_loan', loan_id=prestamo.id) }}" method="post">
+            <td data-label="Alumno">{{ prestamo.estudiante }}<small>{{ prestamo.curso }}</small></td>
+            <td data-label="Equipo">{{ prestamo.articulo }}<small>{{ prestamo.codigo }}</small></td>
+            <td data-label="Cantidad">{{ prestamo.cantidad }}</td><td data-label="Devolución">{{ prestamo.fecha_prevista }}</td>
+            <td data-label="Acción"><form action="{{ url_for('return_loan', loan_id=prestamo.id) }}" method="post">
                 <input type="hidden" name="csrf" value="{{ session.csrf }}"><button>Devuelto</button>
             </form></td>
         </tr>

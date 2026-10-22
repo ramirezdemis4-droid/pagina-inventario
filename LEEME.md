@@ -2,7 +2,7 @@
 
 La interfaz utiliza azul y amarillo, combinados con el escudo del Liceo Bicentenario Manuel Montt en `static/logo1.webp`.
 
-La página tiene solo dos partes, sin JavaScript:
+La página tiene dos partes y utiliza JavaScript para el buscador y las mejoras visuales:
 
 - **Alumno:** nombre, curso, equipo, cantidad y fecha de devolución; botón **Pedir préstamo**.
 - **Encargado:** entrar con contraseña, aprobar o rechazar solicitudes y marcar **Devuelto**.
@@ -52,18 +52,32 @@ Los códigos y sus categorías se definen en `app.py`, en `CATALOGOS`.
 
 El panel **Atajos**, a la izquierda en computador, permite saltar directamente
 a Electrónicos, Periféricos, Infraestructura y Herramientas. Permanece visible
-al bajar por la página. En celular aparece arriba del contenido. Funciona en
-las páginas de alumno y encargado sin JavaScript.
+al bajar por la página. En celular queda fijo en la parte superior de la pantalla,
+también al bajar hasta el final. Se reserva su altura para no tapar el encabezado;
+los saltos a las categorías dejan sus títulos debajo de los atajos. Funciona en
+las páginas de alumno y encargado.
 
 El código de la aplicación está completo en `app.py`. `db.py` contiene la
 conexión, las tablas y la carga inicial del inventario.
+
+## Diseño para teléfono y computador
+
+- En pantallas de hasta 700 px, el catálogo, las solicitudes y los préstamos se
+  muestran como tarjetas con sus etiquetas, sin apretar los textos en columnas.
+- En pantallas más anchas, se muestran tablas; por encima de 850 px los atajos
+  están en un panel lateral. En teléfono y tablet quedan fijos arriba.
+- El buscador y los filtros se apilan en pantallas pequeñas. Los campos usan
+  texto de 16 px y los botones tienen al menos 44 px de alto para facilitar el uso táctil.
+- Los nombres, las fotos, el formulario del alumno y el acceso del encargado
+  se ajustan al ancho disponible. No se necesita cambiar ninguna configuración
+  para pasar de teléfono a computador.
 
 ## Fotos de los objetos
 
 Las fotos recibidas están en `static/fotos`. En las páginas de alumno y encargado
 cada objeto identificado muestra una miniatura. Haz clic para abrir la foto
-completa en otra pestaña. Si tiene varias fotos, abre **Más fotos**.
-No requiere JavaScript. La asociación entre códigos y fotos está en
+ampliada en la misma página. Si tiene varias fotos, abre **Más fotos**.
+Sin JavaScript se abre en otra pestaña. La asociación entre códigos y fotos está en
 `FOTOS_OBJETOS`, dentro de `app.py`.
 
 Audífonos, Mouse Genius y Mouse Invit muestran **Sin foto**, porque el ZIP no
@@ -73,13 +87,14 @@ sin agregar objetos ni cambiar cantidades del inventario.
 
 Los préstamos devueltos dejan de aparecer en el panel. Sus registros se conservan
  en la base de datos. Las solicitudes pendientes no reservan equipos; el stock
-se comprueba y descuenta al aprobar. No hay buscadores, exportaciones ni formularios
-para administrar el inventario en esta versión.
+se comprueba y descuenta al aprobar. El buscador filtra por nombre, código o
+categoría al escribir, ignora mayúsculas y tildes y permite filtrar por
+disponibilidad. No hay exportaciones ni formularios para agregar o quitar objetos.
 
 ## Actualizar sin perder tus datos
 
 1. Detén el servidor con **Ctrl+C**.
-2. Extrae el ZIP y copia los archivos de `proyecto_inventario` a tu carpeta actual, reemplazando el código.
+2. Extrae el ZIP y copia los archivos de `pagina-inventario-main` a tu carpeta actual, reemplazando el código, incluido `app.py`, `templates` y `static`.
 3. **Conserva tu carpeta `instance` y tu archivo `.env`.** El ZIP no los incluye.
 4. En la terminal de VS Code ejecuta:
 
@@ -87,14 +102,14 @@ para administrar el inventario en esta versión.
 python app.py
 ```
 
-5. Abre **http://127.0.0.1:5000** y recarga la página.
+5. Abre **http://127.0.0.1:5000** y recarga con **Ctrl+F5**. En celular, recarga la página en el navegador.
 
 Tu usuario y contraseña del encargado siguen funcionando y no se borran
 los préstamos anteriores.
 
 ## Instalar por primera vez
 
-Abre `proyecto_inventario` en VS Code. En **Terminal → Nueva terminal**, ejecuta:
+Abre `pagina-inventario-main` en VS Code. En **Terminal → Nueva terminal**, ejecuta:
 
 ```powershell
 python -m pip install -r requirements.txt
@@ -136,5 +151,15 @@ Para comprobar el servidor:
 python -m unittest discover -s tests -v
 ```
 
-Se probó con SQLite y JavaScript desactivado. MySQL requiere comprobar tu conexión
+Las pruebas automáticas del servidor usan SQLite. MySQL requiere comprobar tu conexión
 con tus credenciales. El servidor funciona localmente en `127.0.0.1`.
+
+
+## Mejoras visuales con JavaScript
+
+Se agregó `static/app.js`: búsqueda instantánea de objetos/códigos, filtro por disponibilidad, contador de resultados, ampliación de fotos sin abrir otra pestaña y botón para volver arriba. No requiere instalar librerías nuevas ni cambia las operaciones de préstamo o MySQL.
+
+El buscador no funcionaba porque `app.py` bloqueaba todos los scripts con
+`script-src 'none'`. Ahora permite los archivos JavaScript del propio sitio
+con `script-src 'self'`. Es necesario reiniciar Flask después de actualizar
+`app.py`; reemplazar solamente los archivos de `static` no corrige ese bloqueo.

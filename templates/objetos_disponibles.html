@@ -1,6 +1,19 @@
 <section id="objetos-disponibles">
     <h2>Objetos del laboratorio</h2>
     <p class="catalog-note">Disponibilidad y estado según las unidades dañadas registradas por el encargado.</p>
+    <div class="catalog-tools">
+        <label for="catalog-search">Buscar en el inventario</label>
+        <div class="catalog-filter-row">
+            <input id="catalog-search" type="search" placeholder="Buscar objeto o código..." autocomplete="off">
+            <select id="catalog-status" aria-label="Filtrar por disponibilidad">
+                <option value="all">Todos los objetos</option>
+                <option value="available">Disponibles</option>
+                <option value="unavailable">No disponibles</option>
+            </select>
+        </div>
+        <p class="catalog-count" id="catalog-count" role="status" aria-live="polite"></p>
+        <p class="catalog-count" id="catalog-empty" hidden>No se encontraron objetos con esos filtros.</p>
+    </div>
     <div class="table-wrap catalog-table-wrap"><table class="available-table">
         <thead><tr><th scope="col">Objeto</th><th scope="col">Disponible</th><th scope="col">Estado</th></tr></thead>
         {% for categoria in catalogos %}
@@ -9,7 +22,7 @@
         <tbody>
         <tr class="category-row" id="{{ categoria|lower|replace('é', 'e')|replace('í', 'i')|replace('ó', 'o') }}" tabindex="-1"><th colspan="3" scope="rowgroup">{{ categoria }}</th></tr>
         {% for equipo in objetos %}
-        <tr data-codigo="{{ equipo.codigo }}" data-disponibles="{{ equipo.disponibles }}" data-buen-estado="{{ equipo.buen_estado }}" data-danados="{{ equipo.danados }}">
+        <tr class="catalog-item" data-busqueda="{{ (equipo.articulo ~ ' ' ~ equipo.codigo ~ ' ' ~ categoria)|lower|e }}" data-codigo="{{ equipo.codigo }}" data-prestable="{{ 1 if equipo.prestable else 0 }}" data-disponibles="{{ equipo.disponibles }}" data-buen-estado="{{ equipo.buen_estado }}" data-danados="{{ equipo.danados }}">
             <td>{{ equipo.articulo }}<small>{{ equipo.codigo }}</small>
                 {% if equipo.fotos %}
                 <div class="object-photos">
@@ -30,14 +43,14 @@
                 </div>
                 {% else %}<small class="no-photo">Sin foto</small>{% endif %}
             </td>
-            <td>
+            <td data-label="Disponibilidad">
                 {% if not equipo.prestable and equipo.buen_estado > 0 %}
                 <span class="status">Uso en laboratorio</span><small>{{ equipo.buen_estado }} en buen estado</small>
                 {% elif equipo.prestable and equipo.disponibles > 0 %}
                 <span class="status good">Disponible</span><small>{{ equipo.disponibles }} unidades</small>
                 {% else %}<span class="status unavailable">No disponible</span><small>0 unidades</small>{% endif %}
             </td>
-            <td>
+            <td data-label="Estado">
                 {% if equipo.danados == 0 %}<span class="status good">Buen estado</span>
                 {% elif equipo.buen_estado == 0 %}<span class="status unavailable">Fuera de servicio</span>
                 {% else %}<span class="status warning">Con daños</span>{% endif %}

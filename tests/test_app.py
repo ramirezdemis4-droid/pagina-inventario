@@ -50,12 +50,16 @@ class InventoryTests(unittest.TestCase):
         return re.search(r'<section id="objetos-disponibles">(.*?)</section>', client.get(path).text, re.S).group(1)
 
     def object_row(self, client, path, code):
-        return re.search(rf'<tr data-codigo="{code}".*?</tr>', self.catalog(client, path), re.S).group(0)
+        return re.search(rf'<tr\b[^>]*\bdata-codigo="{code}"[^>]*>.*?</tr>', self.catalog(client, path), re.S).group(0)
 
     def test_public_page_and_permissions(self):
         page=self.student.get('/').text
         self.assertIn('Pedir préstamo',page)
-        self.assertNotIn('<script',page.lower())
+        self.assertIn('<script src="/static/app.js?v=3" defer></script>', page)
+        policy = self.student.get('/').headers['Content-Security-Policy']
+        self.assertIn("script-src 'self';", policy)
+        self.assertNotIn("'unsafe-inline'", policy)
+        self.assertNotIn("'unsafe-eval'", policy)
         self.assertNotIn('Solicitudes pendientes',page)
         self.assertEqual(self.student.get('/encargado').location,'/login')
         self.assertEqual(self.student.post('/solicitudes',data=self.payload()).status_code,403)

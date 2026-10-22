@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Préstamos del laboratorio</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css', v='4') }}">
 </head>
-<body>
+<body{% if equipos is defined %} class="has-catalog"{% endif %}>
 <header class="site-header">
     <div class="header-inner">
         <img class="school-logo" src="{{ url_for('static', filename='logo1.webp') }}" alt="Escudo del Liceo Bicentenario Manuel Montt" width="88" height="86">
@@ -29,7 +29,7 @@
     </aside>
     {% endif %}
 <main>
-    <nav aria-label="Navegación">
+    <nav class="main-nav" aria-label="Navegación">
         <a href="{{ url_for('index') }}">Alumno</a>
         {% if session.user_id %}
         <a href="{{ url_for('manager') }}">Encargado</a>
@@ -44,5 +44,11 @@
     {% block content %}{% endblock %}
 </main>
 </div>
+<button id="back-to-top" class="back-to-top" type="button" aria-label="Volver arriba" title="Volver arriba">↑</button>
+<div id="photo-modal" class="photo-modal" role="dialog" aria-modal="true" aria-label="Foto ampliada" hidden>
+    <button class="photo-close" type="button" aria-label="Cerrar imagen">×</button>
+    <img src="" alt="">
+</div>
+<script src="{{ url_for('static', filename='app.js', v='3') }}" defer></script>
 </body>
 </html>
