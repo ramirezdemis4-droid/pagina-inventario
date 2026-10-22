@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block content %}
+{% include 'objetos_disponibles.html' %}
+<section>
+    <h2>Solicitudes pendientes</h2>
+    <div class="table-wrap"><table>
+        <thead><tr><th>Alumno</th><th>Equipo</th><th>Cant.</th><th>Devolución</th><th>Acciones</th></tr></thead>
+        <tbody>{% for solicitud in solicitudes %}
+        <tr>
+            <td>{{ solicitud.estudiante }}<small>{{ solicitud.curso }}</small></td>
+            <td>{{ solicitud.articulo }}<small>{{ solicitud.codigo }}</small></td>
+            <td>{{ solicitud.cantidad }}</td><td>{{ solicitud.fecha_prevista }}</td>
+            <td><div class="actions">
+                <form action="{{ url_for('approve_request', request_id=solicitud.id) }}" method="post">
+                    <input type="hidden" name="csrf" value="{{ session.csrf }}"><button>Aprobar</button>
+                </form>
+                <form action="{{ url_for('reject_request', request_id=solicitud.id) }}" method="post">
+                    <input type="hidden" name="csrf" value="{{ session.csrf }}"><button class="secondary">Rechazar</button>
+                </form>
+            </div></td>
+        </tr>
+        {% else %}<tr><td colspan="5">No hay solicitudes pendientes.</td></tr>{% endfor %}</tbody>
+    </table></div>
+</section>
+<section>
+    <h2>Equipos prestados</h2>
+    <div class="table-wrap"><table>
+        <thead><tr><th>Alumno</th><th>Equipo</th><th>Cant.</th><th>Devolución</th><th>Acción</th></tr></thead>
+        <tbody>{% for prestamo in prestamos %}
+        <tr>
+            <td>{{ prestamo.estudiante }}<small>{{ prestamo.curso }}</small></td>
+            <td>{{ prestamo.articulo }}<small>{{ prestamo.codigo }}</small></td>
+            <td>{{ prestamo.cantidad }}</td><td>{{ prestamo.fecha_prevista }}</td>
+            <td><form action="{{ url_for('return_loan', loan_id=prestamo.id) }}" method="post">
+                <input type="hidden" name="csrf" value="{{ session.csrf }}"><button>Devuelto</button>
+            </form></td>
+        </tr>
+        {% else %}<tr><td colspan="5">No hay equipos prestados.</td></tr>{% endfor %}</tbody>
+    </table></div>
+    <p>Al marcar «Devuelto», el préstamo deja de aparecer aquí.</p>
+</section>
+{% endblock %}

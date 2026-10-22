@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="form-card">
+    <h2>Acceso del encargado</h2>
+    {% if error %}<p class="message error" role="alert">{{ error }}</p>{% endif %}
+    <form method="post">
+        <input type="hidden" name="csrf" value="{{ session.csrf }}">
+        <label for="usuario">Usuario</label><input id="usuario" name="usuario" autocomplete="username" maxlength="60" required>
+        <label for="password">Contraseña</label><input type="password" id="password" name="password" autocomplete="current-password" required>
+        <button>Entrar</button>
+    </form>
+</section>
+{% endblock %}

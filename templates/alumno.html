@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+{% include 'objetos_disponibles.html' %}
+<section class="form-card">
+    <h2>Solicitar un equipo</h2>
+    <p>Completa tus datos. El encargado aprobará tu solicitud.</p>
+    <form action="{{ url_for('request_loan') }}" method="post">
+        <input type="hidden" name="csrf" value="{{ session.csrf }}">
+        <label for="nombre">Nombre del alumno</label><input id="nombre" name="estudiante" maxlength="100" required>
+        <label for="curso">Curso</label><input id="curso" name="curso" maxlength="60" placeholder="Ej: 2° Medio B" required>
+        <label for="equipo">Equipo</label><select id="equipo" name="equipo_id" required>
+            <option value="">Selecciona un equipo</option>
+            {% set disponibles = equipos|selectattr('prestable')|selectattr('disponibles', 'gt', 0)|list %}
+            {% for categoria in catalogos %}
+            {% set objetos = disponibles|selectattr('categoria', 'equalto', categoria)|list %}
+            {% if objetos %}<optgroup label="{{ categoria }}">
+            {% for equipo in objetos %}
+            <option value="{{ equipo.id }}">{{ equipo.articulo }} · {{ equipo.codigo }} ({{ equipo.disponibles }} disponibles)</option>
+            {% endfor %}</optgroup>{% endif %}
+            {% endfor %}
+        </select>
+        <div class="row">
+            <div><label for="cantidad">Cantidad</label><input type="number" id="cantidad" name="cantidad" min="1" max="100000" value="1" required></div>
+            <div><label for="fecha">Fecha de devolución</label><input type="date" id="fecha" name="fecha_prevista" min="{{ fecha }}" value="{{ fecha }}" required></div>
+        </div>
+        <button type="submit">Pedir préstamo</button>
+    </form>
+</section>
+{% endblock %}

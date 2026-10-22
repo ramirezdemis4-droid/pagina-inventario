@@ -1,0 +1,60 @@
+<section id="objetos-disponibles">
+    <h2>Objetos del laboratorio</h2>
+    <p class="catalog-note">Disponibilidad y estado según las unidades dañadas registradas por el encargado.</p>
+    <div class="table-wrap catalog-table-wrap"><table class="available-table">
+        <thead><tr><th scope="col">Objeto</th><th scope="col">Disponible</th><th scope="col">Estado</th></tr></thead>
+        {% for categoria in catalogos %}
+        {% set grupo = equipos|selectattr('categoria', 'equalto', categoria)|list %}
+        {% set objetos = grupo if categoria == 'Infraestructura' else grupo|selectattr('prestable')|list %}
+        <tbody>
+        <tr class="category-row" id="{{ categoria|lower|replace('é', 'e')|replace('í', 'i')|replace('ó', 'o') }}" tabindex="-1"><th colspan="3" scope="rowgroup">{{ categoria }}</th></tr>
+        {% for equipo in objetos %}
+        <tr data-codigo="{{ equipo.codigo }}" data-disponibles="{{ equipo.disponibles }}" data-buen-estado="{{ equipo.buen_estado }}" data-danados="{{ equipo.danados }}">
+            <td>{{ equipo.articulo }}<small>{{ equipo.codigo }}</small>
+                {% if equipo.fotos %}
+                <div class="object-photos">
+                    <a class="photo-link" href="{{ url_for('static', filename='fotos/' ~ equipo.fotos[0]) }}" target="_blank" rel="noopener" aria-label="Ver foto de {{ equipo.articulo }}">
+                        <img class="object-photo" src="{{ url_for('static', filename='fotos/' ~ equipo.fotos[0]) }}" alt="{{ equipo.articulo }}" width="120" height="90" loading="lazy">
+                    </a>
+                    {% if equipo.fotos|length > 1 %}
+                    <details class="more-photos"><summary>Más fotos ({{ equipo.fotos|length - 1 }})</summary>
+                        <div class="photo-grid">
+                        {% for foto in equipo.fotos[1:] %}
+                            <a class="photo-link" href="{{ url_for('static', filename='fotos/' ~ foto) }}" target="_blank" rel="noopener" aria-label="Ver otra foto de {{ equipo.articulo }}">
+                                <img class="object-photo" src="{{ url_for('static', filename='fotos/' ~ foto) }}" alt="Otra foto de {{ equipo.articulo }}" width="120" height="90" loading="lazy">
+                            </a>
+                        {% endfor %}
+                        </div>
+                    </details>
+                    {% endif %}
+                </div>
+                {% else %}<small class="no-photo">Sin foto</small>{% endif %}
+            </td>
+            <td>
+                {% if not equipo.prestable and equipo.buen_estado > 0 %}
+                <span class="status">Uso en laboratorio</span><small>{{ equipo.buen_estado }} en buen estado</small>
+                {% elif equipo.prestable and equipo.disponibles > 0 %}
+                <span class="status good">Disponible</span><small>{{ equipo.disponibles }} unidades</small>
+                {% else %}<span class="status unavailable">No disponible</span><small>0 unidades</small>{% endif %}
+            </td>
+            <td>
+                {% if equipo.danados == 0 %}<span class="status good">Buen estado</span>
+                {% elif equipo.buen_estado == 0 %}<span class="status unavailable">Fuera de servicio</span>
+                {% else %}<span class="status warning">Con daños</span>{% endif %}
+                <small>En buen estado: {{ equipo.buen_estado }}</small><small>Dañadas: {{ equipo.danados }}</small>
+                {% if session.user_id %}
+                <details class="condition-edit"><summary>Revisar</summary>
+                    <form action="{{ url_for('update_condition', equipment_id=equipo.id) }}" method="post">
+                        <input type="hidden" name="csrf" value="{{ session.csrf }}">
+                        <label for="danados-{{ equipo.id }}">Unidades dañadas</label>
+                        <input type="number" id="danados-{{ equipo.id }}" name="danados" min="0" max="{{ equipo.cantidad }}" value="{{ equipo.danados }}" required>
+                        <button type="submit">Guardar</button>
+                    </form>
+                </details>
+                {% endif %}
+            </td>
+        </tr>
+        {% else %}<tr><td colspan="3">Sin objetos en esta categoría.</td></tr>{% endfor %}</tbody>
+        {% endfor %}
+    </table></div>
+</section>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Préstamos del laboratorio</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+<header class="site-header">
+    <div class="header-inner">
+        <img class="school-logo" src="{{ url_for('static', filename='logo1.webp') }}" alt="Escudo del Liceo Bicentenario Manuel Montt" width="88" height="86">
+        <div>
+            <p class="school-name">Liceo Bicentenario Manuel Montt</p>
+            <h1>Préstamos del laboratorio</h1>
+        </div>
+    </div>
+</header>
+<div class="page-layout{% if equipos is defined %} with-shortcuts{% endif %}">
+    {% if equipos is defined %}
+    <aside class="shortcut-panel" aria-labelledby="shortcuts-title">
+        <h2 id="shortcuts-title">Atajos</h2>
+        <nav class="shortcut-links" aria-label="Atajos del catálogo">
+            <a href="#electronicos">Electrónicos</a>
+            <a href="#perifericos">Periféricos</a>
+            <a href="#infraestructura">Infraestructura</a>
+            <a href="#herramientas">Herramientas</a>
+        </nav>
+    </aside>
+    {% endif %}
+<main>
+    <nav aria-label="Navegación">
+        <a href="{{ url_for('index') }}">Alumno</a>
+        {% if session.user_id %}
+        <a href="{{ url_for('manager') }}">Encargado</a>
+        <form action="{{ url_for('logout') }}" method="post">
+            <input type="hidden" name="csrf" value="{{ session.csrf }}"><button class="secondary">Salir</button>
+        </form>
+        {% else %}<a href="{{ url_for('login') }}">Entrar como encargado</a>{% endif %}
+    </nav>
+    {% for category, message in get_flashed_messages(with_categories=true) %}
+    <p class="message {{ category }}" role="status">{{ message }}</p>
+    {% endfor %}
+    {% block content %}{% endblock %}
+</main>
+</div>
+</body>
+</html>
